@@ -1,0 +1,63 @@
+@startuml
+!define RECTANGLE class
+'this pragma line allows using the ||0|| notation to extend the activated portion a bit
+!pragma teoz true
+
+!define GreenYellow #99FF99
+!define LightSkyBlue #CCE5FF
+
+skinparam sequence {
+    ArrowColor Black
+    ArrowFontColor Black
+    ActorBorderColor Black
+    ActorBackgroundColor GreenYellow
+    ParticipantBorderColor Black
+    ParticipantBackgroundColor LightSkyBlue
+    LifeLineBorderColor Black
+    LifeLineBackgroundColor GreenYellow
+    NoteBackgroundColor LightSkyBlue
+}
+
+User -> ClientWebsite : Visits
+ClientWebsite -> CloudflareWorkers : Request
+CloudflareWorkers -> CloudflareWorkers : Retrieve React UI Chat Bot Bundle
+note bottom: acting as a CDN to deliver bundle
+CloudflareWorkers --> ClientWebsite : React UI
+
+ClientWebsite -> CustomVFUIElement : Loads Custom VF UI Element
+CustomVFUIElement -> VoiceflowServer : Authenticate with Project ID
+VoiceflowServer -> CustomVFUIElement : Successful Authentication
+CustomVFUIElement --> ClientWebsite : Render
+|||
+User <-> CustomVFUIElement : Interaction
+|||
+|||
+||0|| 
+activate CustomVFUIElement 
+User -> CustomVFUIElement : chat message requesting scheduling
+CustomVFUIElement -> VoiceflowServer : fwd req to server
+VoiceflowServer -> CustomVFUIElement : Sends custom 'Calendar' message
+CustomVFUIElement -> CustomVFUIElement : Renders custom react calendar element in the chat
+||0|| 
+deactivate CustomVFUIElement 
+|||
+User -> CustomVFUIElement : Clicks Calendar Element, picking a day
+
+activate VoiceflowServer 
+CustomVFUIElement -> VoiceflowServer : Forward selected day to VF server
+activate CloudflareWorkers
+VoiceflowServer -> CloudflareWorkers : Request for calendar free slots on the chosen day
+CloudflareWorkers-> GoogleCalendarAPI : Authenticate with Service Account Token
+GoogleCalendarAPI --> CloudflareWorkers: Responds with authentication result
+CloudflareWorkers -> GoogleCalendarAPI : Request all free/busy info from Google Calendar
+GoogleCalendarAPI --> CloudflareWorkers : Responds with free/busy Schedule
+CloudflareWorkers -> CloudflareWorkers : Transform Schedule into free slots
+CloudflareWorkers --> VoiceflowServer : Sends free slots as Response JSON
+deactivate CloudflareWorkers
+VoiceflowServer -> VoiceflowServer : Converts to user-friendly Chatbot Response
+VoiceflowServer -> CustomVFUIElement : Sends Chatbot Response
+||0||
+deactivate VoiceflowServer 
+
+User -> CustomVFUIElement: Read Response & Proceed
+@enduml
