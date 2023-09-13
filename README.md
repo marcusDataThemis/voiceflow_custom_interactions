@@ -16,7 +16,7 @@ sequenceDiagram
 
     User ->> ClientWebsite: Visits
        note right of ClientWebsite: Load UI
-    rect rgb(191, 223, 255) 
+   %% rect rgb(191, 223, 255) 
 
     ClientWebsite ->> CloudflareWorkers: Request
     CloudflareWorkers ->> CloudflareWorkers: Retrieve React UI Chat Bot Bundle
@@ -27,13 +27,13 @@ sequenceDiagram
     CustomVFUIElement ->> VoiceflowServer: Authenticate with Project ID
     VoiceflowServer ->> CustomVFUIElement: Successful Authentication
     CustomVFUIElement -->> ClientWebsite: Render
-    end
+ %%   end
       loop
     User -->> CustomVFUIElement: send message to bot
     CustomVFUIElement -->> User : receive reply
     end
 note right of ClientWebsite: Scheduling
-rect rgb(191, 223, 255) 
+%%rect rgb(191, 223, 255) 
     activate CustomVFUIElement
     
     
@@ -60,7 +60,7 @@ rect rgb(191, 223, 255)
     deactivate VoiceflowServer
 
     User ->> CustomVFUIElement: Read Response & Proceed
-end
+%%end
 ```
 
 Diagram created and editable via: https://mermaid.live/edit
