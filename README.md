@@ -6,7 +6,7 @@ https://marcusdatathemis.github.io/voiceflow_custom_interactions/
 
 calendar: https://calendar.google.com/calendar/u/2/r/week
 
-```
+```mermaid
 sequenceDiagram
     participant User
     participant ClientWebsite
